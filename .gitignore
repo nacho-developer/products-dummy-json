@@ -14,10 +14,6 @@ target/
 # Log files
 *.log
 
-# Spring Boot Application properties
-src/main/resources/application.properties
-src/main/resources/application.yml
-
 # Test generated files
 target/generated-test-sources/
 

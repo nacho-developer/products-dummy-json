@@ -1,0 +1,17 @@
+rest:
+  dummyJson:
+    urlBase: https://dummyjson.com
+    pathUsers: /users
+    pathCarts: /carts/user/{userId}
+    pathProducts: /products
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: '/v3/api-docs'
+  swagger-ui:
+    path: '/swagger-ui'
+    config-url: '/ingress-path/v3/api-docs/swagger-config'
+    url: '/ingress-path/v3/api-docs'
+    doc-expansion: none
+    disable-swagger-default-url: true
