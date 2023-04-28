@@ -19,12 +19,12 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 public class UserServiceImplTest {
+	
+	@InjectMocks
+	private UserServiceImpl userService;
 
     @Mock
     private UserRepository userRepository;
-
-    @InjectMocks
-    private UserServiceImpl userService;
 
     @BeforeEach
     public void setUp() {

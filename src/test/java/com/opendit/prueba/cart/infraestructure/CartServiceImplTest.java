@@ -1,9 +1,11 @@
 package com.opendit.prueba.cart.infraestructure;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +44,7 @@ class CartServiceImplTest {
 	}
 
 	@Test
-    void getProductsByUser_ReturnsEmptyMap_WhenNoUsersFound() {
+    void testGetProductsByUserWhenNoUsersFound() {
         when(userService.getAllUsers()).thenReturn(Flux.empty());
 
         Mono<Map<String, ProductSummary>> result = cartService.getProductsByUser();
@@ -51,54 +53,61 @@ class CartServiceImplTest {
             .expectNext(Collections.emptyMap())
             .verifyComplete();
     }
-
+	
 	@Test
-	void getProductsByUser_ReturnsCorrectProductSummary_WhenUsersFound() {
+    void testGetProductsByUser() {
 		User user1 = new User();
 		user1.setId(1L);
 		User user2 = new User();
 		user2.setId(2L);
-
-		ProductCart product1 = new ProductCart();
-		product1.setId(1L);
-		product1.setTitle("product1");
-		product1.setPrice(1L);
-		product1.setQuantity(1L);
-		product1.setTotal(200L);
-		product1.setDiscountPercentage(2.0);
-		product1.setDiscountedPrice(2L);
-		ProductCart product2 = new ProductCart();
-		product2.setId(2L);
-		product2.setTitle("product2");
-		product2.setPrice(100L);
-		product2.setQuantity(2L);
-		product2.setTotal(200L);
-		product2.setDiscountPercentage(3.0);
-		product2.setDiscountedPrice(2L);
-
-		Cart cart1 = new Cart();
-		cart1.setProducts(List.of(product1));
-		Cart cart2 = new Cart();
-		cart2.setProducts(List.of(product2));
-
-		Carts carts1 = new Carts();
-		carts1.setCarts(List.of(cart1));
-		Carts carts2 = new Carts();
-		carts2.setCarts(List.of(cart2));
-
-		when(userService.getAllUsers()).thenReturn(Flux.just(user1, user2));
-		when(cartRepository.findByUserId(1L)).thenReturn(Mono.just(carts1));
-		when(cartRepository.findByUserId(2L)).thenReturn(Mono.just(carts2));
-
-		Mono<Map<String, ProductSummary>> result = cartService.getProductsByUser();
-
-		Map<String, ProductSummary> expectedMap = new HashMap<>();
-		expectedMap.put("1-product1", new ProductSummary("1-product1", 1L, 8.0, 8.0));
-		expectedMap.put("2-product2", new ProductSummary("2-product2", 2L, 32.0, 16.0));
-
-		StepVerifier
-			.create(result)
-			.expectNext(expectedMap)
-			.verifyComplete();
-	}
+        
+        List<ProductCart> user1Cart = List.of(
+            new ProductCart(1L, "Product 1", 10L, 2L, 20L, 0.0, 20L),
+            new ProductCart(2L, "Product 2", 20L, 1L, 20L, 0.2, 16L)
+        );
+        
+        List<ProductCart> user2Cart = List.of(
+            new ProductCart(1L, "Product 1", 10L, 1L, 10L, 0.1, 9L),
+            new ProductCart(3L, "Product 3", 30L, 3L, 90L, 0.3, 63L)
+        );
+        
+        List<Cart> cart1 = List.of(
+        	Cart.builder().products(user1Cart).build()
+        );
+        
+        List<Cart> cart2 = List.of(
+        	Cart.builder().products(user2Cart).build()
+        );
+        
+        when(userService.getAllUsers()).thenReturn(Flux.just(user1, user2));
+        
+        when(cartRepository.findByUserId(1L)).thenReturn(Mono.just(Carts.builder().carts(cart1).build()));
+        when(cartRepository.findByUserId(2L)).thenReturn(Mono.just(Carts.builder().carts(cart2).build()));
+        
+        Map<String, ProductSummary> result = cartService.getProductsByUser().block();
+        
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertTrue(result.containsKey("1-Product 1"));
+        assertTrue(result.containsKey("2-Product 2"));
+        assertTrue(result.containsKey("3-Product 3"));
+        
+        ProductSummary summary1 = result.get("1-Product 1");
+        assertNotNull(summary1);
+        assertEquals(3L, summary1.getQuantity());
+        assertEquals(20L, summary1.getTotalPrice(), 0.0);
+        assertEquals(14.5, summary1.getAverageDiscount(), 0.0);
+        
+        ProductSummary summary2 = result.get("2-Product 2");
+        assertNotNull(summary2);
+        assertEquals(1L, summary2.getQuantity());
+        assertEquals(20L, summary2.getTotalPrice(), 0.0);
+        assertEquals(16, summary2.getAverageDiscount(), 0.0);
+        
+        ProductSummary summary3 = result.get("3-Product 3");
+        assertNotNull(summary3);
+        assertEquals(3L, summary3.getQuantity());
+        assertEquals(30L, summary3.getTotalPrice(), 0.0);
+        assertEquals(63, summary3.getAverageDiscount(), 0.0);
+    }
 }

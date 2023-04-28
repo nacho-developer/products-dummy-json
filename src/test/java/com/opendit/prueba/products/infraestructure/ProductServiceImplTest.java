@@ -2,8 +2,6 @@ package com.opendit.prueba.products.infraestructure;
 
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,7 +12,6 @@ import com.opendit.prueba.products.domain.ProductRepository;
 import com.opendit.prueba.products.domain.entity.BrandCount;
 import com.opendit.prueba.products.domain.entity.CategoryCount;
 import com.opendit.prueba.products.domain.entity.Product;
-import com.opendit.prueba.products.domain.entity.Products;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,28 +19,28 @@ import reactor.test.StepVerifier;
 
 class ProductServiceImplTest {
 
+	@InjectMocks
+	private ProductServiceImpl productService;
+	
     @Mock
     private ProductRepository productRepository;
 
-    @InjectMocks
-    private ProductServiceImpl productService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
+    
     @Test
     void testGetHighestPricedProduct() {
         Product product1 = new Product();
         product1.setPrice(10L);
+        product1.setTitle("Product 1");
         Product product2 = new Product();
         product2.setPrice(20L);
+        product2.setTitle("Product 2");
         
-        Products products = new Products();
-        products.setProducts(List.of(product1, product2));
-
-        when(productRepository.findAll()).thenReturn(Mono.just(products));
+        when(productRepository.findAll()).thenReturn(Flux.just(product1, product2));
 
         Mono<Product> highestPricedProduct = productService.getHighestPricedProduct();
         StepVerifier.create(highestPricedProduct)
@@ -57,11 +54,8 @@ class ProductServiceImplTest {
         product1.setPrice(10L);
         Product product2 = new Product();
         product2.setPrice(20L);
-        
-        Products products = new Products();
-        products.setProducts(List.of(product1, product2));
 
-        when(productRepository.findAll()).thenReturn(Mono.just(products));
+        when(productRepository.findAll()).thenReturn(Flux.just(product1, product2));
 
         Mono<Product> lowestPricedProduct = productService.getLowestPricedProduct();
         StepVerifier.create(lowestPricedProduct)
@@ -75,11 +69,8 @@ class ProductServiceImplTest {
         product1.setPrice(10L);
         Product product2 = new Product();
         product2.setPrice(20L);
-        
-        Products products = new Products();
-        products.setProducts(List.of(product1, product2));
 
-        when(productRepository.findAll()).thenReturn(Mono.just(products));
+        when(productRepository.findAll()).thenReturn(Flux.just(product1, product2));
 
         Mono<Double> averagePrice = productService.getAveragePrice();
         StepVerifier.create(averagePrice)
@@ -93,11 +84,8 @@ class ProductServiceImplTest {
         product1.setBrand("Brand1");
         Product product2 = new Product();
         product2.setBrand("Brand2");
-        
-        Products products = new Products();
-        products.setProducts(List.of(product1, product2));
 
-        when(productRepository.findAll()).thenReturn(Mono.just(products));
+        when(productRepository.findAll()).thenReturn(Flux.just(product1, product2));
 
         Flux<BrandCount> productsByBrand = productService.getProductsByBrand();
         StepVerifier.create(productsByBrand)
@@ -115,10 +103,7 @@ class ProductServiceImplTest {
         Product product3 = new Product();
         product3.setCategory("Category1");
         
-        Products products = new Products();
-        products.setProducts(List.of(product1, product2, product3));
-        
-        when(productRepository.findAll()).thenReturn(Mono.just(products));
+        when(productRepository.findAll()).thenReturn(Flux.just(product1, product2, product3));
 
         Flux<CategoryCount> productsByCategory = productService.getProductsByCategory();
         StepVerifier.create(productsByCategory)
