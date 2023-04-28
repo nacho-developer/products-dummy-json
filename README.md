@@ -2,7 +2,7 @@
 
 Este proyecto esta creado con Java 17 y Spring Boot, usando Web-Flux para reactividad
 
-se ha usado esta API [dummyjson](https://dummyjson.com){:target="_blank"} para obtener los datos en formato JSON
+se ha usado esta API [dummyjson](https://dummyjson.com) para obtener los datos en formato JSON
 
 ## Funcionamiento
 
