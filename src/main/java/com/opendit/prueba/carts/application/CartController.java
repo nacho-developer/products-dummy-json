@@ -16,6 +16,12 @@ import io.swagger.annotations.ApiResponses;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 
+/**
+ * This class represents the REST controller for the Cart API.
+ * It provides endpoints for retrieving cart data.
+ * 
+ * @author Nacho Dominguez
+ */
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/carts")
@@ -24,6 +30,11 @@ public class CartController {
 	
 	private final CartService cartService;
 	
+	/**
+	 * This method retrieves all products by user.
+	 * 
+	 * @return a {@link Mono} containing a {@link Map} of {@link ProductSummaty} objects keyed by their IDs.
+	 */
 	@ApiOperation(value = "Get all products by user")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful operation", response = Map.class)

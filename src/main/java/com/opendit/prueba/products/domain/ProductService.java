@@ -9,8 +9,6 @@ import reactor.core.publisher.Mono;
 
 public interface ProductService {
 	
-	Flux<Product> getAllProducts();
-
 	Mono<Product> getHighestPricedProduct();
 
 	Mono<Product> getLowestPricedProduct();

@@ -10,12 +10,21 @@ import com.opendit.prueba.products.domain.ProductService;
 import com.opendit.prueba.products.domain.entity.BrandCount;
 import com.opendit.prueba.products.domain.entity.CategoryCount;
 import com.opendit.prueba.products.domain.entity.Product;
-import com.opendit.prueba.products.domain.entity.Products;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * Implementation of the ProductService interface that provides methods for
+ * retrieving and processing product data. This class uses caching to optimize
+ * performance and reduce API calls.
+ * 
+ * @author Nacho Dominguez
+ *
+ */
 @Service
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
 	private final ProductRepository productRepository;
@@ -24,31 +33,39 @@ public class ProductServiceImpl implements ProductService {
 		this.productRepository = productRepository;
 	}
 
-	@Cacheable("allProducts")
-	@Override
-	public Flux<Product> getAllProducts() {
-		return productRepository.findAll().flatMapIterable(Products::getProducts);
-	}
-
+	/**
+	 * Retrieves the highest priced product.
+	 * @return a {@link Mono} of {@link Product}.
+	 */
 	@Cacheable("highestPricedProductCache")
 	@Override
 	public Mono<Product> getHighestPricedProduct() {
-		return getAllProducts()
+		log.info("Method: getHighestPricedProduct");
+		return productRepository.findAll()
 				.reduce((p1, p2) -> p1.getPrice() > p2.getPrice() ? p1 : p2);
-
 	}
 
+	/**
+	 * Retrieves the lowest priced product.
+	 * @return a {@link Mono} of {@link Product}.
+	 */
 	@Cacheable("lowestPricedProductCache")
 	@Override
 	public Mono<Product> getLowestPricedProduct() {
-		return getAllProducts()
+		log.info("Method: getLowestPricedProduct");
+		return productRepository.findAll()
 				.reduce((p1, p2) -> p1.getPrice() < p2.getPrice() ? p1 : p2);
 	}
 
+	/**
+	 * Retrieves the average price of all products.
+	 * @return a {@link Mono} of {@link Double}.
+	 */
 	@Cacheable("averagePricedProductCache")
 	@Override
 	public Mono<Double> getAveragePrice() {
-		Flux<Product> products = getAllProducts();
+		log.info("Method: getAveragePrice");
+		Flux<Product> products = productRepository.findAll();
 		return products
 				.map(Product::getPrice)
 				.reduce(0.0, (p1, p2) -> p1 + p2)
@@ -56,10 +73,15 @@ public class ProductServiceImpl implements ProductService {
 				.map(tuple -> tuple.getT1() / (double) tuple.getT2());
 	}
 
+	/**
+	 * Retrieves the count of products for each brand.
+	 * @return a {@link Flux} of {@link BrandCount}.
+	 */
 	@Cacheable("productsByBrandCache")
 	@Override
 	public Flux<BrandCount> getProductsByBrand() {
-		return getAllProducts()
+		log.info("Method: getProductsByBrand");
+		return productRepository.findAll()
 				.groupBy(Product::getBrand)
 				.flatMap(group -> 
 					group.count()
@@ -67,10 +89,15 @@ public class ProductServiceImpl implements ProductService {
 				.sort(Comparator.comparing(BrandCount::getBrand));
 	}
 
+	/**
+	 * Retrieves the count of products for each category.
+	 * @return a {@link Flux} of {@link CategoryCount}.
+	 */
 	@Cacheable("productsByCategoryCache")
 	@Override
 	public Flux<CategoryCount> getProductsByCategory() {
-		return getAllProducts()
+		log.info("Method: getProductsByCategory");
+		return productRepository.findAll()
 				.groupBy(Product::getCategory)
 				.flatMap(group -> 
 					group.count()
