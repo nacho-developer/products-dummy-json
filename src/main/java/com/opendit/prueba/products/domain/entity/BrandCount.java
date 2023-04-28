@@ -1,12 +1,10 @@
 package com.opendit.prueba.products.domain.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 public class BrandCount {
 
 	private String brand;

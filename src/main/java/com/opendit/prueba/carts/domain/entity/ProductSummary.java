@@ -1,14 +1,12 @@
 package com.opendit.prueba.carts.domain.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 public class ProductSummary {
 	private String id;
 	private long quantity;

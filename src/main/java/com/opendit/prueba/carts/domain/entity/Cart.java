@@ -2,11 +2,15 @@ package com.opendit.prueba.carts.domain.entity;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Data
 public class Cart {
 	private long id;
 	private List<ProductCart> products;

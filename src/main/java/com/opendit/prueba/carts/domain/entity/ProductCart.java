@@ -1,10 +1,12 @@
 package com.opendit.prueba.carts.domain.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class ProductCart {
 	private long id;
 	private String title;
